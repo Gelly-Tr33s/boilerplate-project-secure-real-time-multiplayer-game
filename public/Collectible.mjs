@@ -1,8 +1,11 @@
 class Collectible {
-  constructor({x, y, value, id}) {
-
+  constructor({ x = 0, y = 0, value = 1, id = '' } = {}) {
+    this.id = id;
+    this.x = Number(x);
+    this.y = Number(y);
+    this.value = Number(value);
+    this.size = 8;
   }
-
 }
 
 /*
