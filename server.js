@@ -21,7 +21,7 @@ app.use(
     },
   })
 );
-app.use(helmet.nocache());
+app.use(helmet.noCache());
 
 
 app.use('/public', express.static(process.cwd() + '/public'));
