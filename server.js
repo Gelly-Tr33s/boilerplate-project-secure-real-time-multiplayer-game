@@ -12,23 +12,17 @@ const runner = require('./test-runner.js');
 const app = express();
 
 // Security measures
-app.use((req, res, next) => {
-  res.setHeader('X-Powered-By', 'PHP 7.4.3');
-  next();
-});
-
 app.use(
   helmet({
-    xDnsPrefetchControl: { allow: false },
+    noSniff: true,
+    xssFilter: true,
+    hidePoweredBy: {
+      setTo: 'PHP 7.4.3',
+    },
   })
 );
+app.use(nocache());
 
-app.use(helmet.noSniff());
-app.use(helmet.xssFilter());
-//app.use(helmet.dnsPreFetchControl());
-app.use(helmet.noCache());
-
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use('/assets', express.static(process.cwd() + '/assets'));
