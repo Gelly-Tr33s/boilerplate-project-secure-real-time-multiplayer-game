@@ -1,37 +1,41 @@
 class Player {
-  constructor({ x = 0, y = 0, score = 0, id = '' } = {}) {
+  constructor({x = 0, y = 0, score = 0, id = null}) {
     this.id = id;
-    this.x = Number(x);
-    this.y = Number(y);
-    this.score = Number(score);
-    this.size = 16;
+    this.x = x;
+    this.y = y;
+    this.score = score;
   }
 
 
-  movePlayer(dir, speed) {
-    if (dir === 'up') this.y -= speed;
-    else if (dir === 'down') this.y += speed;
-    else if (dir === 'left') this.x -= speed;
-    else if (dir === 'right') this.x += speed;
-
-    if (this.x < 0) this.x = 0;
-    if (this.x > 640) this.x = 640;
-    if (this.y < 0) this.y = 0;
-    if (this.y > 480) this.y = 480;
+  // movePlayer(direction, amount)
+  movePlayer(dir, amount) {
+    if (dir === 'up') this.y -= amount;
+    else if (dir === 'down') this.y += amount;
+    else if (dir === 'left') this.x -= amount;
+    else if (dir === 'right') this.x += amount;
+    return this;
   }
 
+  // collision with a collectible (circle)
   collision(item) {
-    const itemSize = item.size || 10;
-    const halfPlayer = this.size;
-    const dx = Math.abs(this.x - item.x);
-    const dy = Math.abs(this.y - item.y);
-    return (dx <= (halfPlayer + itemSize) && dy <= (halfPlayer + itemSize));
+    if (!item) return false;
+    const dx = this.x - item.x;
+    const dy = this.y - item.y;
+    const dist2 = dx*dx + dy*dy;
+    // player approx as radius 8, item radius = item.size or 8
+    const r = (item.size || 8) + 8;
+    return dist2 <= r*r;
   }
 
- calculateRank(arr = []) {
-    const greater = arr.filter(p => Number(p.score) > Number(this.score)).length;
-    const rank = greater + 1;
-    return `Rank: ${rank}/${arr.length}`;
+  // calculate rank string based on array of players [{id,score}, ...]
+  calculateRank(arr) {
+    if (!Array.isArray(arr)) return 'Rank: 1/1';
+    // sort descending by score
+    const sorted = arr.slice().sort((a,b) => b.score - a.score);
+    const total = sorted.length || 1;
+    const pos = sorted.findIndex(x => x.id === this.id);
+    const rankNum = pos === -1 ? total : (pos + 1);
+    return `Rank: ${rankNum}/${total}`;
   }
 }
 

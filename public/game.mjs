@@ -13,8 +13,10 @@ const SPEED = 5;
 const KEYS = {};
 
 function draw() {
+  // clear
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // draw collectibles
   Object.values(collectibles).forEach(c => {
     ctx.fillStyle = '#ffcc00';
     ctx.beginPath();
@@ -22,6 +24,7 @@ function draw() {
     ctx.fill();
   });
 
+  // draw players
   Object.values(players).forEach(p => {
     if (p.id === myId) ctx.fillStyle = '#00aaff';
     else ctx.fillStyle = '#ff4466';
@@ -54,6 +57,7 @@ function handleInput() {
     me.x += SPEED; moved = true;
   }
 
+  // clamp to canvas
   if (me.x < 0) me.x = 0;
   if (me.x > canvas.width) me.x = canvas.width;
   if (me.y < 0) me.y = 0;
@@ -67,7 +71,7 @@ function handleInput() {
 window.addEventListener('keydown', (e) => { KEYS[e.key] = true; });
 window.addEventListener('keyup', (e) => { KEYS[e.key] = false; });
 
-socket.on('connect', () => {});
+socket.on('connect', () => { /* connected */ });
 
 socket.on('init', (data) => {
   myId = data.you;
