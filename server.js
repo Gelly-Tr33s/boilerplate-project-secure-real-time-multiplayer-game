@@ -28,6 +28,8 @@ app.use(helmet.xssFilter());
 //app.use(helmet.dnsPreFetchControl());
 app.use(helmet.noCache());
 
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use('/assets', express.static(process.cwd() + '/assets'));
 
