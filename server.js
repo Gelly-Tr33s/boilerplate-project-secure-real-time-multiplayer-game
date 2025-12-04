@@ -67,7 +67,7 @@ function makeCollectible() {
 for (let i = 0; i < 6; i++) makeCollectible();
 
 // Socket.io logic
-io.on('connection', (socket) => {
+socketio.on('connection', (socket) => {
   // create a player object
   const p = {
     id: socket.id,
