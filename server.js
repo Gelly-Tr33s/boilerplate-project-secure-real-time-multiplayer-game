@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const expect = require('chai');
-const socketio = require('socket.io');
+const io = require('socket.io');
 const cors = require('cors');
 const helmet = require('helmet');
 
@@ -67,7 +67,7 @@ function makeCollectible() {
 for (let i = 0; i < 6; i++) makeCollectible();
 
 // Socket.io logic
-socketio.on('connection', (socket) => {
+io.on('connection', (socket) => {
   // create a player object
   const p = {
     id: socket.id,
