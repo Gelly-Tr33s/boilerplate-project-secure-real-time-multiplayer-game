@@ -17,9 +17,15 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(
+  helmet({
+    xDnsPrefetchControl: { allow: false },
+  })
+);
+
 app.use(helmet.noSniff());
 app.use(helmet.xssFilter());
-app.use(helmet.dnsPreFetchControl());
+//app.use(helmet.dnsPreFetchControl());
 app.use(helmet.noCache());
 
 app.use('/public', express.static(process.cwd() + '/public'));
