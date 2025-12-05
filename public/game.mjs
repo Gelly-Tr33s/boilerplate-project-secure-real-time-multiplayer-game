@@ -91,7 +91,7 @@ window.addEventListener("keydown", (e) => {
   let newX = me.x;
   let newY = me.y;
 
-  const speed = 4;
+  const speed = 10;
 
   if (e.key === "w" || e.key === "ArrowUp") newY -= speed;
   if (e.key === "s" || e.key === "ArrowDown") newY += speed;
