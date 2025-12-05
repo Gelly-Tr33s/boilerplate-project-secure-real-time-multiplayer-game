@@ -48,9 +48,9 @@ app.route('/')
 fccTestingRoutes(app);
     
 
-// Basic in-memory game state 
-const players = {};      // socketId => { id, x, y, score }
-const collectibles = {}; // id => { id, x, y, value, size }
+// Basic in-memory game state
+const players = {};      
+const collectibles = {}; 
 
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function makeCollectible() {
@@ -69,44 +69,52 @@ function makeCollectible() {
 // Ensure a few collectibles exist
 for (let i = 0; i < 6; i++) makeCollectible();
 
-// Socket.io logic
+// Socket.io 
 io.on('connection', (socket) => {
   // create a player object
   const p = {
     id: socket.id,
     x: randInt(40, 520),
     y: randInt(40, 320),
-    score: 0
+    score: 0,
+    name: `Player_${Object.keys(players).length + 1}`,
+    color: `hsl(${Math.floor(Math.random() * 360)}, 80%, 50%)`
   };
   players[socket.id] = p;
 
-  // send initial state to new client
+  // Send full initial state
+  socket.emit("state", {
+    players,
+    collectibles: Object.values(collectibles)
+  });
+
+  // Also send "init"
   socket.emit('init', {
     you: socket.id,
     players,
     collectibles: Object.values(collectibles)
   });
 
-  // announce new player to others
+  // notify others
   socket.broadcast.emit('player-joined', p);
 
-  // handle move messages
+  // handle movement
   socket.on('move', (data) => {
     const player = players[socket.id];
     if (!player) return;
 
-    // Accept client position update
+    // apply movement
     player.x = data.x;
     player.y = data.y;
 
-    // collision detection with collectibles (circle vs point)
+    // collision detection
     let collidedId = null;
     for (const cid in collectibles) {
       const c = collectibles[cid];
       const dx = player.x - c.x;
       const dy = player.y - c.y;
       const dist2 = dx*dx + dy*dy;
-      const thresh = (c.size + 8) * (c.size + 8); // player half-size ~8
+      const thresh = (c.size + 8) * (c.size + 8);
       if (dist2 <= thresh) {
         collidedId = cid;
         break;
@@ -117,13 +125,12 @@ io.on('connection', (socket) => {
       const removed = collectibles[collidedId];
       delete collectibles[collidedId];
 
-      // award score
+      // award points
       player.score += removed.value;
 
-      // create replacement collectible
+      // add new collectible
       const newC = makeCollectible();
 
-      // broadcast collected event
       io.emit('collected', {
         collectibleId: collidedId,
         newCollectible: newC,
@@ -131,15 +138,20 @@ io.on('connection', (socket) => {
       });
     }
 
-    // broadcast movement (including updated score if changed)
-    io.emit('player-moved', { id: player.id, x: player.x, y: player.y, score: player.score });
+    // broadcast full updated state
+    io.emit("state", {
+      players,
+      collectibles: Object.values(collectibles)
+    });
   });
 
+  // handle disconnect
   socket.on('disconnect', () => {
     delete players[socket.id];
     io.emit('player-left', socket.id);
   });
 });
+
 
 
 // 404 Not Found Middleware
